@@ -20,6 +20,10 @@
   color: #2c3e50;
 }
 
+body.dark .dashboard-title {
+  color: #f1f1f1;
+}
+
 .dashboard-logout {
   background-color: #ff4e50;
   color: white;
@@ -33,6 +37,27 @@
 
 .dashboard-logout:hover {
   background-color: #e84118;
+}
+
+.header-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.theme-toggle {
+  background-color: #6c5ce7;
+  color: white;
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+
+.theme-toggle:hover {
+  background-color: #4834d4;
 }
 
 .dashboard-body {

@@ -19,6 +19,20 @@ const Dashboard = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("entries");
   const [entries, setEntries] = useState([]);
+  const [theme, setTheme] = useState("light");
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme") || "light";
+    setTheme(savedTheme);
+    document.body.className = savedTheme;
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    document.body.className = newTheme;
+    localStorage.setItem("theme", newTheme);
+  };
 
   const logout = () => {
     signOut(auth);
@@ -92,9 +106,14 @@ const Dashboard = () => {
     <div className="dashboard-wrapper">
       <header className="dashboard-header">
         <h2 className="dashboard-title">💸 Expense Tracker</h2>
-        <button className="dashboard-logout" onClick={logout}>
-          Logout
-        </button>
+        <div className="header-controls">
+          <button className="theme-toggle" onClick={toggleTheme}>
+            {theme === "light" ? "🌙 Dark Mode" : "☀️ Light Mode"}
+          </button>
+          <button className="dashboard-logout" onClick={logout}>
+            Logout
+          </button>
+        </div>
       </header>
 
       <div className="dashboard-body">

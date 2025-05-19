@@ -16,6 +16,10 @@
   text-align: center;
 }
 
+body.dark .entrylist-balance {
+  color: #f1f1f1;
+}
+
 .entrylist-empty {
   text-align: center;
   color: #7f8c8d;
@@ -48,8 +52,16 @@
   font-weight: 600;
 }
 
+body.dark .entrylist-details p {
+  color: #f1f1f1;
+}
+
 .entrylist-details small {
   color: #7f8c8d;
+}
+
+body.dark .entrylist-details small {
+  color: #cccccc;
 }
 
 .entrylist-buttons {
