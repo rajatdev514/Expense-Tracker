@@ -1,0 +1,42 @@
+.entryform-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: #ffffff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  max-width: 500px;
+  margin: 0 auto 2rem auto;
+}
+
+.entryform-input,
+.entryform-select {
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  transition: border 0.3s ease;
+}
+
+.entryform-input:focus,
+.entryform-select:focus {
+  border-color: #3498db;
+  outline: none;
+}
+
+.entryform-button {
+  background-color: #2ecc71;
+  color: white;
+  border: none;
+  padding: 0.8rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+
+.entryform-button:hover {
+  background-color: #27ae60;
+}
