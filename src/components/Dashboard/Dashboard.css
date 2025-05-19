@@ -39,6 +39,18 @@ body.dark .dashboard-title {
   background-color: #e84118;
 }
 
+.profile-icon {
+  border: none;
+  background: none;
+  cursor: pointer;
+  margin-left: 10px;
+}
+.profile-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
 .header-controls {
   display: flex;
   gap: 1rem;

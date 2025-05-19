@@ -113,6 +113,13 @@ const Dashboard = () => {
           <button className="dashboard-logout" onClick={logout}>
             Logout
           </button>
+          <button className="profile-icon" onClick={() => navigate("/profile")}>
+            <img
+              src="/images/profile-icon.jpg" // You can use user's photoURL too
+              alt="Profile"
+              className="profile-img"
+            />
+          </button>
         </div>
       </header>
 

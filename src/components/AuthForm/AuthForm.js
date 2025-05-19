@@ -1,6 +1,8 @@
 // Import required hooks
 import { useState } from "react";
 import { auth } from "../../firebase"; // Firebase authentication instance
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../../firebase";
 import "./AuthForm.css";
 import {
   signInWithEmailAndPassword,
@@ -27,6 +29,26 @@ const AuthForm = () => {
     // if (password.length < 6) {
     //   return alert("Password must be at least 6 characters long.");
     // }
+    if (!isLogin) {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+
+      // Create profile document in Firestore
+      await setDoc(doc(db, "profiles", user.uid), {
+        name: "", // Empty or default values
+        city: "",
+        state: "",
+        dob: "",
+        gender: "",
+        mobile: "",
+        photoURL: "",
+        email: user.email,
+      });
+    }
     try {
       if (isLogin) {
         // Sign in with Firebase if user is logging in
