@@ -1,4 +1,3 @@
-// Import required hooks
 import { useState } from "react";
 import { auth } from "../../firebase"; // Firebase authentication instance
 import { doc, setDoc } from "firebase/firestore";
@@ -8,6 +7,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
 } from "firebase/auth"; // Firebase Auth functions
+import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom"; // Navigation hook for redirecting
 
 const AuthForm = () => {
@@ -22,44 +22,67 @@ const AuthForm = () => {
 
   // Function to handle form submission
   const handleAuth = async (e) => {
-    e.preventDefault(); // Prevent default form reload behavior
-    // if (!email.includes("@")) {
-    //   return alert("Please enter a valid email address.");
-    // }
-    // if (password.length < 6) {
-    //   return alert("Password must be at least 6 characters long.");
-    // }
-    if (!isLogin) {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const user = userCredential.user;
+    e.preventDefault();
 
-      // Create profile document in Firestore
-      await setDoc(doc(db, "profiles", user.uid), {
-        name: "", // Empty or default values
-        city: "",
-        state: "",
-        dob: "",
-        gender: "",
-        mobile: "",
-        photoURL: "",
-        email: user.email,
-      });
+    if (!email.includes("@")) {
+      return toast.error("Invalid email format");
     }
+    if (password.length < 6) {
+      return toast.error("Password should be atleast 6 letters long");
+    }
+
     try {
       if (isLogin) {
-        // Sign in with Firebase if user is logging in
+        // Login flow
         await signInWithEmailAndPassword(auth, email, password);
+        toast.success("Logged in successfully!");
       } else {
-        // Register with Firebase if user is signing up
-        await createUserWithEmailAndPassword(auth, email, password);
+        // Register flow
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+        const user = userCredential.user;
+
+        // Create Firestore profile
+        await setDoc(doc(db, "profiles", user.uid), {
+          name: "",
+          city: "",
+          state: "",
+          dob: "",
+          gender: "",
+          mobile: "",
+          photoURL: "",
+          email: user.email,
+        });
+        toast.success("Registered successfully!");
       }
-      navigate("/dashboard"); // Redirect user to dashboard on success
+
+      navigate("/dashboard");
     } catch (err) {
-      alert(err.message); // Show error message if login/register fails
+      console.error("Authentication error:", err);
+
+      switch (err.code) {
+        case "auth/invalid-email":
+          toast.error("Invalid email format.");
+          break;
+        case "auth/wrong-password":
+          toast.error("Wrong password.");
+          break;
+        case "auth/user-not-found":
+          toast.error("Email is not registered.");
+          break;
+        case "auth/email-already-in-use":
+          toast.error("Email is already registered.");
+          break;
+        case "auth/too-many-requests":
+          toast.error("Too many failed attempts. Please try again later.");
+          break;
+        default:
+          toast.error("Authentication failed. Please try again.");
+          break;
+      }
     }
   };
 
@@ -84,6 +107,7 @@ const AuthForm = () => {
             className="authform-input"
             type="email"
             placeholder="Email"
+            value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
@@ -92,6 +116,7 @@ const AuthForm = () => {
             className="authform-input"
             type="password"
             placeholder="Password"
+            value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
