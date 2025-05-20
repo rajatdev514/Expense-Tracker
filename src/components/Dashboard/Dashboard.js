@@ -11,6 +11,7 @@ import { db } from "../../firebase";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { useAuth } from "../../AuthContext";
 import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 Chart.register(ArcElement, Tooltip, Legend);
 
@@ -61,12 +62,16 @@ const Dashboard = () => {
         label: "Expenses",
         data: Object.values(categoryData),
         backgroundColor: [
-          "#FF6384",
-          "#36A2EB",
-          "#FFCE56",
-          "#9b59b6",
-          "#2ecc71",
-          "#f39c12",
+          "#FF6384", // soft red
+          "#36A2EB", // sky blue
+          "#FFCE56", // light yellow
+          "#9b59b6", // purple
+          "#2ecc71", // green
+          "#f39c12", // orange
+          "#e74c3c", // vivid red
+          "#1abc9c", // teal
+          "#34495e", // dark blue-gray
+          "#8e44ad", // deep purple
         ],
         borderWidth: 1,
       },
@@ -75,28 +80,51 @@ const Dashboard = () => {
 
   const downloadPDF = () => {
     const doc = new jsPDF();
+    // const userName = user.displayName || "User";
+    const totalBalance = entries.reduce((sum, entry) => {
+      return entry.type === "income" ? sum + entry.amount : sum - entry.amount;
+    }, 0);
+
+    // Title
     doc.setFontSize(18);
     doc.text("Expense Tracker Report", 14, 22);
 
-    let y = 32;
+    // User info and balance
     doc.setFontSize(12);
-    entries.forEach((entry, index) => {
-      const { type, category, amount, date, note } = entry;
-      doc.text(
-        `${
-          index + 1
-        }. [${type.toUpperCase()}] Category: ${category}, Amount: ₹${amount}, Date: ${date}, Note: ${
-          note || "N/A"
-        }`,
-        14,
-        y
-      );
-      y += 10;
+    doc.setTextColor(100);
+    // doc.text(`Name: ${userName}`, 14, 30);
+    doc.text(`Current Balance: ${totalBalance.toFixed(2)}`, 150, 30);
 
-      if (y > 280) {
-        doc.addPage();
-        y = 20;
-      }
+    // Table content
+    const tableColumn = ["Type", "Category", "Amount (₹)", "Date", "Note"];
+    const tableRows = [];
+
+    entries.forEach(({ type, category, amount, date, note }) => {
+      const rowData = [
+        type.charAt(0).toUpperCase() + type.slice(1),
+        category,
+        amount.toFixed(2),
+        date,
+        note || "N/A",
+      ];
+      tableRows.push(rowData);
+    });
+
+    autoTable(doc, {
+      startY: 40,
+      head: [tableColumn],
+      body: tableRows,
+      theme: "grid",
+      styles: {
+        fontSize: 12,
+        cellPadding: 3,
+      },
+      headStyles: {
+        fillColor: [52, 73, 94],
+        textColor: 255,
+        fontStyle: "bold",
+      },
+      alternateRowStyles: { fillColor: [240, 240, 240] },
     });
 
     doc.save("ExpenseTracker_Report.pdf");
