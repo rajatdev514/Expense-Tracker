@@ -1,43 +1,46 @@
 import { useState } from "react";
-import { auth } from "../../firebase"; // Firebase authentication instance
+import { auth, db } from "../../firebase";
 import { doc, setDoc } from "firebase/firestore";
-import { db } from "../../firebase";
 import "./AuthForm.css";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-} from "firebase/auth"; // Firebase Auth functions
+  sendEmailVerification,
+  sendPasswordResetEmail,
+} from "firebase/auth";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom"; // Navigation hook for redirecting
+import { useNavigate } from "react-router-dom";
 
 const AuthForm = () => {
-  // State to toggle between login and register mode
   const [isLogin, setIsLogin] = useState(true);
-
-  // State to store email and password input values
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const navigate = useNavigate(); // Hook to programmatically navigate between routes
+  const navigate = useNavigate();
 
-  // Function to handle form submission
   const handleAuth = async (e) => {
     e.preventDefault();
 
-    if (!email.includes("@")) {
-      return toast.error("Invalid email format");
-    }
-    if (password.length < 6) {
-      return toast.error("Password should be atleast 6 letters long");
-    }
+    if (!email.includes("@")) return toast.error("Invalid email format");
+    if (password.length < 6) return toast.error("Password too short");
 
     try {
       if (isLogin) {
-        // Login flow
-        await signInWithEmailAndPassword(auth, email, password);
+        const userCredential = await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+        const user = userCredential.user;
+
+        if (!user.emailVerified) {
+          await auth.signOut();
+          return toast.error("Email not verified. Check your inbox.");
+        }
+
         toast.success("Logged in successfully!");
+        navigate("/dashboard");
       } else {
-        // Register flow
         const userCredential = await createUserWithEmailAndPassword(
           auth,
           email,
@@ -45,7 +48,11 @@ const AuthForm = () => {
         );
         const user = userCredential.user;
 
-        // Create Firestore profile
+        await sendEmailVerification(user);
+        toast.success(
+          "Verification email sent. Please verify before logging in."
+        );
+
         await setDoc(doc(db, "profiles", user.uid), {
           name: "",
           city: "",
@@ -56,13 +63,11 @@ const AuthForm = () => {
           photoURL: "",
           email: user.email,
         });
-        toast.success("Registered successfully!");
-      }
 
-      navigate("/dashboard");
+        await auth.signOut();
+      }
     } catch (err) {
       console.error("Authentication error:", err);
-
       switch (err.code) {
         case "auth/invalid-email":
           toast.error("Invalid email format.");
@@ -71,18 +76,32 @@ const AuthForm = () => {
           toast.error("Wrong password.");
           break;
         case "auth/user-not-found":
-          toast.error("Email is not registered.");
+          toast.error("User not found.");
           break;
         case "auth/email-already-in-use":
-          toast.error("Email is already registered.");
+          toast.error("Email already in use.");
           break;
         case "auth/too-many-requests":
-          toast.error("Too many failed attempts. Please try again later.");
+          toast.error("Too many attempts. Try again later.");
           break;
         default:
-          toast.error("Authentication failed. Please try again.");
+          toast.error("Authentication failed.");
           break;
       }
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      return toast.error("Enter your email to reset password");
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      toast.success("Password reset email sent.");
+    } catch (err) {
+      console.error("Forgot password error:", err);
+      toast.error("Failed to send reset email. Check the email address.");
     }
   };
 
@@ -97,21 +116,43 @@ const AuthForm = () => {
         </p>
       </div>
 
-      <form className="authform" onSubmit={handleAuth}>
-        <div className="authform-inner">
+      <div className="authform">
+        <video className="authform-video" autoPlay muted loop playsInline>
+          <source src="/images/authform-bg-video.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+
+        {/* 🔄 Toggle Buttons ABOVE the form card */}
+        <div className="form-toggle-buttons">
+          <button
+            type="button"
+            className={`toggle-btn ${isLogin ? "active" : ""}`}
+            onClick={() => setIsLogin(true)}
+          >
+            🔐 Login
+          </button>
+          <button
+            type="button"
+            className={`toggle-btn ${!isLogin ? "active" : ""}`}
+            onClick={() => setIsLogin(false)}
+          >
+            ✍️ Register
+          </button>
+        </div>
+
+        <form className="authform-inner" onSubmit={handleAuth}>
           <h2 className="authform-title">
-            {isLogin ? "Login🔐" : "Register🔒"}
+            {isLogin ? "Welcome Back!" : "Create Your Account"}
           </h2>
 
           <input
             className="authform-input"
             type="email"
-            placeholder="Email"
+            placeholder="Email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-
           <input
             className="authform-input"
             type="password"
@@ -121,15 +162,17 @@ const AuthForm = () => {
             required
           />
 
+          {isLogin && (
+            <p className="authform-forgot" onClick={handleForgotPassword}>
+              Forgot password?
+            </p>
+          )}
+
           <button className="authform-button" type="submit">
             {isLogin ? "Login" : "Register"}
           </button>
-
-          <p className="authform-toggle" onClick={() => setIsLogin(!isLogin)}>
-            {isLogin ? "New user? Register" : "Have an account? Login"}
-          </p>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 };
