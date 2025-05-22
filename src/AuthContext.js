@@ -6,11 +6,27 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // Track auth loading
 
-  useEffect(() => onAuthStateChanged(auth, (u) => setUser(u)), []);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      setLoading(false); // Finished loading auth state
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={{ user, loading }}>
+      {loading ? (
+        <div style={{ textAlign: "center", marginTop: "50px" }}>
+          <div className="spinner" />
+        </div>
+      ) : (
+        children
+      )}
+    </AuthContext.Provider>
   );
 };
 

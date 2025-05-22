@@ -81,27 +81,29 @@ const EntryForm = () => {
 
         <select
           className="entryform-select"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-        >
-          <option value="Food">Food</option>
-          <option value="Bills">Bills</option>
-          <option value="Clothing">Clothing</option>
-          <option value="Transport">Transport</option>
-          <option value="Healthcare">Healthcare</option>
-          <option value="Bike">Bike</option>
-          <option value="Grocery">Grocery</option>
-          <option value="Other">Other</option>
-        </select>
-
-        <select
-          className="entryform-select"
           value={type}
           onChange={(e) => setType(e.target.value)}
         >
           <option value="income">Income</option>
           <option value="expense">Expense</option>
         </select>
+
+        {type === "expense" && (
+          <select
+            className="entryform-select"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            <option value="Food">Food</option>
+            <option value="Bills">Bills</option>
+            <option value="Clothing">Clothing</option>
+            <option value="Transport">Transport</option>
+            <option value="Healthcare">Healthcare</option>
+            <option value="Bike">Bike</option>
+            <option value="Grocery">Grocery</option>
+            <option value="Other">Other</option>
+          </select>
+        )}
 
         <button className="entryform-button" type="submit">
           Add Entry

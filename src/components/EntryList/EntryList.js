@@ -17,14 +17,46 @@ import "./EntryList.css";
 const EntryList = () => {
   const { user } = useAuth();
   const [entries, setEntries] = useState([]);
+  const [filteredEntries, setFilteredEntries] = useState([]);
 
+  // Filter states
+  const [filterType, setFilterType] = useState("all");
+  const [filterCategory, setFilterCategory] = useState("all");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  // Fetch all entries
   useEffect(() => {
     const q = query(collection(db, "entries"), where("uid", "==", user.uid));
     const unsub = onSnapshot(q, (snapshot) => {
-      setEntries(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+      const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setEntries(data);
     });
     return () => unsub();
   }, [user]);
+
+  // Apply filters
+  useEffect(() => {
+    let filtered = entries;
+
+    if (filterType !== "all") {
+      filtered = filtered.filter((e) => e.type === filterType);
+    }
+
+    if (filterCategory !== "all") {
+      filtered = filtered.filter((e) => e.category === filterCategory);
+    }
+
+    if (startDate) {
+      filtered = filtered.filter((e) => e.date >= startDate);
+    }
+
+    if (endDate) {
+      filtered = filtered.filter((e) => e.date <= endDate);
+    }
+
+    setFilteredEntries(filtered);
+  }, [entries, filterType, filterCategory, startDate, endDate]);
 
   const deleteEntry = async (id) => {
     const confirm = window.confirm(
@@ -58,17 +90,82 @@ const EntryList = () => {
     return e.type === "income" ? sum + e.amount : sum - e.amount;
   }, 0);
 
+  const categories = [
+    "Food",
+    "Bills",
+    "Clothing",
+    "Transport",
+    "Healthcare",
+    "Bike",
+    "Grocery",
+    "Other",
+  ];
+
   return (
     <div className="entrylist-container">
       <ToastContainer position="top-right" autoClose={3000} />
       <h3 className="entrylist-balance">💰 Balance: ₹{balance.toFixed(2)}</h3>
 
-      {entries.length === 0 ? (
-        <p className="entrylist-empty">
-          No entries yet. Add one to get started!
-        </p>
+      <div className="entrylist-filters">
+        {/* Type Filter */}
+        <div className="filter-group">
+          <label htmlFor="filter-type">Type</label>
+          <select
+            id="filter-type"
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value)}
+          >
+            <option value="all">All Types</option>
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+          </select>
+        </div>
+
+        {/* Category Filter */}
+        <div className="filter-group">
+          <label htmlFor="filter-category">Category</label>
+          <select
+            id="filter-category"
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
+          >
+            <option value="all">All Categories</option>
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Start Date Filter */}
+        <div className="filter-group">
+          <label htmlFor="start-date">Start Date</label>
+          <input
+            id="start-date"
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
+        </div>
+
+        {/* End Date Filter */}
+        <div className="filter-group">
+          <label htmlFor="end-date">End Date</label>
+          <input
+            id="end-date"
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
+        </div>
+      </div>
+
+      {/* Entry List */}
+      {filteredEntries.length === 0 ? (
+        <p className="entrylist-empty">No entries match the filters.</p>
       ) : (
-        entries.map((e) => (
+        filteredEntries.map((e) => (
           <div
             className={`entrylist-item ${
               e.type === "income" ? "income" : "expense"
