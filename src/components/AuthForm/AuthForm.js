@@ -117,10 +117,10 @@ const AuthForm = () => {
       </div>
 
       <div className="authform">
-        <video className="authform-video" autoPlay muted loop playsInline>
-          <source src="/images/authform-bg-video.mp4" type="video/mp4" />
+        {/* <video className="authform-video" autoPlay muted loop playsInline>
+          <source src="/images/authform-bg-video4.mp4" type="video/mp4" />
           Your browser does not support the video tag.
-        </video>
+        </video> */}
 
         {/* 🔄 Toggle Buttons ABOVE the form card */}
         <div className="form-toggle-buttons">

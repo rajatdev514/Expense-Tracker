@@ -5,7 +5,7 @@
   align-items: stretch;
   height: 100vh;
   width: 100%;
-  background: #92a8be;
+  background: #8868d3;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -13,12 +13,12 @@
 .auth-info {
   flex: 1;
   padding: 4rem;
-  background: linear-gradient(to bottom right, #ffffff, #e3f2fd);
+  background-image: linear-gradient(to top, #8868d3 0%, #e86fc6 100%);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  border-right: 1px solid #ccc;
+  /* border-right: 1px solid #ccc; */
   color: #333;
 }
 
@@ -29,23 +29,23 @@
 .auth-info h1 {
   font-size: 3rem;
   margin-bottom: 1rem;
-  color: #0d47a1;
+  color: #ffffff;
 }
 
 .auth-info p {
   font-size: 1.2rem;
   max-width: 500px;
-  color: #555;
+  color: #ffffff;
 }
 
 .authform {
   position: relative;
   display: flex;
-  background: linear-gradient(to bottom right, #ffffff, #e3f2fd);
+  background-image: linear-gradient(to top, #8868d3 0%, #e86fc6 100%);
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  padding: 6rem 3rem 3rem;
+  padding: 6rem 6rem 6rem;
   overflow: hidden;
 }
 
@@ -67,20 +67,11 @@
   z-index: 1;
 }
 
-.authform-inner {
-  width: 100%;
-  max-width: 400px;
-  background: #ffffff;
-  padding: 2.5rem;
-  border-radius: 12px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-}
-
 .authform-title {
   text-align: center;
   margin-bottom: 1.5rem;
   font-size: 2rem;
-  color: #0d47a1;
+  color: #663cc6;
 }
 
 /* Form elements */
@@ -107,7 +98,7 @@
   margin-top: 1rem;
   border: none;
   border-radius: 8px;
-  background-image: linear-gradient(to right, #1976d2, #42a5f5);
+  background: #663cc6;
   color: #fff;
   font-size: 1rem;
   font-weight: bold;
@@ -116,7 +107,7 @@
 }
 
 .authform-button:hover {
-  background-image: linear-gradient(to right, #1565c0, #1e88e5);
+  background: #280f61;
   transform: translateY(-2px);
 }
 
@@ -173,14 +164,14 @@
 }
 
 .toggle-btn.active {
-  background-color: #1976d2;
+  background-color: #663cc6;
   color: white;
   box-shadow: 0 4px 8px rgba(25, 118, 210, 0.2);
 }
 
 .toggle-btn:hover {
-  background-color: #bbdefb;
-  color: #0d47a1;
+  background-color: #c5b5eb;
+  color: rgb(91, 133, 196);
 }
 
 .authform-inner {

@@ -186,7 +186,7 @@ const Profile = () => {
             className="profile-photo"
           />
         </div>
-        <div>
+        <div className="profile-header-name">
           <h2>{profile.name || "Your Name"}</h2>
           <h3>💰 Balance: ₹{balance}</h3>
         </div>

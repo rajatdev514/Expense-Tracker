@@ -2,7 +2,8 @@
   max-width: 600px;
   margin: 0 auto;
   padding: 1.2rem;
-  background: #d4faf7;
+  background: rgba(238, 218, 240, 0.6); /* Semi-transparent white */
+  backdrop-filter: blur(15px); /* Frosted glass effect */
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
   font-family: "Segoe UI", sans-serif;
